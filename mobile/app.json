@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "GastOn",
+    "slug": "gaston-expenses",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#F8FAFC"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F8FAFC"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "scheme": "gaston",
+    "platforms": ["ios", "android", "web"]
+  }
+}
