@@ -105,24 +105,14 @@ export interface ExpenseNameQuery extends PaginationQuery, SearchQuery {
 export interface ExpenseQuery extends PaginationQuery, DateRangeQuery {}
 
 // Response Types for Lists
-export interface CategoriesResponse {
-  categories: Category[];
-  total: number;
-  page: number;
-  limit: number;
-}
+export type CategoriesResponse = Category[];
 
 export interface CategoriesWithStatsResponse {
   categories: CategoryWithStats[];
   total: number;
 }
 
-export interface ExpenseNamesResponse {
-  expenseNames: ExpenseName[];
-  total: number;
-  page: number;
-  limit: number;
-}
+export type ExpenseNamesResponse = ExpenseName[];
 
 export interface ExpenseNamesWithStatsResponse {
   expenseNames: ExpenseNameWithStats[];

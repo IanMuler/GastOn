@@ -1,6 +1,6 @@
 // Vista semanal principal - adaptada directamente de timeTracker
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ExpenseWithDetails } from '@/types/api';
 import { ExpenseItem } from './ExpenseItem';
@@ -12,25 +12,41 @@ import {
   getCurrentDay, 
   getCurrentWeekDates 
 } from '@/utils/dateUtils';
-import { 
-  EXPENSES_MOCK, 
-  getExpensesByCategory,
-  getCategoryStateForDate 
-} from '@/utils/mockData';
+import { useCurrentWeekExpenses } from '@/services/api';
+import { Category } from '@/types/api';
 
 export const WeeklyView: React.FC = () => {
   /* States */
   const [selectedDay, setSelectedDay] = useState(getCurrentDay()); // Default to current day
   
-  // Get current week dates and expenses
+  // Get current week data with React Query
+  const { 
+    data: weeklyData, 
+    isLoading, 
+    error, 
+    refetch 
+  } = useCurrentWeekExpenses();
+  
+  // Get current week dates
   const { dates } = getCurrentWeekDates();
   const selectedDateString = dates[selectedDay];
   
-  // Filter expenses for selected date
-  const dayExpenses = EXPENSES_MOCK.filter(expense => expense.fecha === selectedDateString);
+  // Find the selected day data from the weekly response
+  const selectedDayData = (weeklyData?.days || []).find(day => day.date === selectedDateString);
+  const dayExpenses = selectedDayData?.expenses || [];
   
   // Organize expenses by category for the selected day
-  const expensesByCategory = getExpensesByCategory(dayExpenses);
+  const expensesByCategory = dayExpenses.reduce((acc, expense) => {
+    const categoryName = expense.categoria.nombre;
+    if (!acc[categoryName]) {
+      acc[categoryName] = {
+        categoria: expense.categoria,
+        expenses: [],
+      };
+    }
+    acc[categoryName].expenses.push(expense);
+    return acc;
+  }, {} as Record<string, { categoria: Category; expenses: ExpenseWithDetails[] }>);
   
   /* Handlers */
   const handleDaySelect = (dayIndex: number) => {
@@ -40,6 +56,10 @@ export const WeeklyView: React.FC = () => {
   const handleAddExpense = () => {
     console.log('Add expense clicked');
     // TODO: Open modal or navigate to add expense screen
+  };
+
+  const handleRefresh = () => {
+    refetch();
   };
   
   const handleExpensePress = (expense: ExpenseWithDetails) => {
@@ -109,8 +129,47 @@ export const WeeklyView: React.FC = () => {
     );
   };
 
+  // Loading and Error States
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        {DayTabs}
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Cargando gastos...</Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        {DayTabs}
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorTitle}>Error al cargar gastos</Text>
+          <Text style={styles.errorSubtitle}>
+            {error instanceof Error ? error.message : 'Error desconocido'}
+          </Text>
+          <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
+            <Text style={styles.retryButtonText}>Reintentar</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   const ExpensesList = (
-    <ScrollView style={styles.expensesContainer} showsVerticalScrollIndicator={false}>
+    <ScrollView 
+      style={styles.expensesContainer} 
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={isLoading}
+          onRefresh={handleRefresh}
+          tintColor={colors.primary}
+        />
+      }
+    >
       {Object.keys(expensesByCategory).length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>Sin gastos registrados</Text>
@@ -252,5 +311,49 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 8,
+  },
+  
+  // Loading states
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+  },
+  loadingText: {
+    fontSize: typography.sizes.base,
+    color: colors.textSecondary,
+  },
+  
+  // Error states
+  errorContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+  },
+  errorTitle: {
+    fontSize: typography.sizes.lg,
+    fontWeight: typography.weights.bold,
+    color: colors.error,
+    marginBottom: spacing.sm,
+    textAlign: 'center',
+  },
+  errorSubtitle: {
+    fontSize: typography.sizes.base,
+    color: colors.textSecondary,
+    marginBottom: spacing.lg,
+    textAlign: 'center',
+  },
+  retryButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    fontSize: typography.sizes.base,
+    fontWeight: typography.weights.medium,
+    color: colors.surface,
   },
 });

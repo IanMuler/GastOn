@@ -1,7 +1,7 @@
 const dotenv = require('dotenv');
 
 // Load environment variables from .env file
-dotenv.config({ path: '../.env' });
+dotenv.config();
 
 const config = {
   // Server configuration
@@ -35,7 +35,7 @@ const config = {
 };
 
 // Validate required environment variables
-const requiredEnvVars = ['DATABASE_URL', 'DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'];
+const requiredEnvVars = ['DATABASE_URL'];
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {

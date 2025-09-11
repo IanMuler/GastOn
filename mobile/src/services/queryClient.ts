@@ -1,23 +1,44 @@
-// TanStack Query client configuration
 import { QueryClient } from '@tanstack/react-query';
 
+// Configure the query client with optimized defaults for GastOn
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutos
-      gcTime: 1000 * 60 * 10, // 10 minutos (renamed from cacheTime)
-      retry: 2,
+      // Default stale time - data is considered fresh for this duration
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      
+      // Cache time - data stays in cache for this duration when unused
+      gcTime: 10 * 60 * 1000, // 10 minutes (was cacheTime in v4)
+      
+      // Retry failed requests
+      retry: (failureCount, error: any) => {
+        // Don't retry on 400-499 errors (client errors)
+        if (error?.statusCode >= 400 && error?.statusCode < 500) {
+          return false;
+        }
+        // Retry up to 3 times for other errors
+        return failureCount < 3;
+      },
+      
+      // Retry delay with exponential backoff
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      
+      // Refetch on window focus
       refetchOnWindowFocus: false,
+      
+      // Refetch on reconnect
+      refetchOnReconnect: true,
     },
     mutations: {
-      retry: 1,
+      // Retry mutations on network errors
+      retry: (failureCount, error: any) => {
+        // Don't retry on 400-499 errors (client errors)
+        if (error?.statusCode >= 400 && error?.statusCode < 500) {
+          return false;
+        }
+        // Retry up to 2 times for other errors
+        return failureCount < 2;
+      },
     },
   },
 });
-
-// Mock hooks for development (will be replaced with real API calls later)
-export const useMockExpenses = () => {
-  // For now, we'll just import the mock data directly
-  // Later this will be replaced with actual TanStack Query hooks
-  return { data: [], isLoading: false, error: null };
-};
