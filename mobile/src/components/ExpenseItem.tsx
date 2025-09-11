@@ -1,7 +1,7 @@
 // Componente individual de gasto - adaptado de TaskItem de timeTracker
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { ExpenseWithDetails } from '@/types/expense';
+import { ExpenseWithDetails } from '@/types/api';
 import { colors } from '@/styles/colors';
 import { typography, textStyles } from '@/styles/typography';
 import { spacing, componentSpacing } from '@/styles/spacing';

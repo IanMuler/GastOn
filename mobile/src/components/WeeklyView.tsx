@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ExpenseWithDetails } from '@/types/expense';
+import { ExpenseWithDetails } from '@/types/api';
 import { ExpenseItem } from './ExpenseItem';
 import { colors } from '@/styles/colors';
 import { typography, textStyles } from '@/styles/typography';

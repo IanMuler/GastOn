@@ -16,7 +16,7 @@ import { colors } from '@/styles/colors';
 import { typography, textStyles } from '@/styles/typography';
 import { spacing, componentSpacing } from '@/styles/spacing';
 import { CATEGORIES_MOCK, EXPENSE_NAMES_MOCK } from '@/utils/mockData';
-import { Category, ExpenseName } from '@/types/expense';
+import { Category, ExpenseName } from '@/types/api';
 
 type TabType = 'nombres' | 'categorias';
 type ModalType = 'category' | 'expenseName' | 'delete' | null;
@@ -48,7 +48,7 @@ export default function ManageScreen() {
 
   // Form states
   const [categoryForm, setCategoryForm] = useState({ nombre: '', color: CATEGORY_COLORS[0] });
-  const [expenseNameForm, setExpenseNameForm] = useState({ nombre: '', categoria_sugerida_id: categories[0]?.id || 1 });
+  const [expenseNameForm, setExpenseNameForm] = useState({ nombre: '', categoria_sugerida_id: categories[0]?.id ?? 1 });
 
   /* Handlers */
   const handleAddCategory = () => {
@@ -64,7 +64,7 @@ export default function ManageScreen() {
   };
 
   const handleAddExpenseName = () => {
-    setExpenseNameForm({ nombre: '', categoria_sugerida_id: categories[0]?.id || 1 });
+    setExpenseNameForm({ nombre: '', categoria_sugerida_id: categories[0]?.id ?? 1 });
     setEditingItem(null);
     setModalType('expenseName');
   };
@@ -72,7 +72,7 @@ export default function ManageScreen() {
   const handleEditExpenseName = (expenseName: ExpenseName) => {
     setExpenseNameForm({ 
       nombre: expenseName.nombre, 
-      categoria_sugerida_id: expenseName.categoria_sugerida_id 
+      categoria_sugerida_id: expenseName.categoria_sugerida_id ?? 1
     });
     setEditingItem(expenseName);
     setModalType('expenseName');
@@ -157,7 +157,7 @@ export default function ManageScreen() {
     }
 
     setModalType(null);
-    setExpenseNameForm({ nombre: '', categoria_sugerida_id: categories[0]?.id || 1 });
+    setExpenseNameForm({ nombre: '', categoria_sugerida_id: categories[0]?.id ?? 1 });
   };
 
   /* Sub-components */

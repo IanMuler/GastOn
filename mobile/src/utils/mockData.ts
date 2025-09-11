@@ -1,5 +1,5 @@
 // Datos mock para desarrollo - inspirados en timeTracker pero para gastos
-import { Category, ExpenseName, ExpenseWithDetails } from '@/types/expense';
+import { Category, ExpenseName, ExpenseWithDetails } from '@/types/api';
 import { colors } from '@/styles/colors';
 import { getCurrentWeekDates, formatDate } from './dateUtils';
 

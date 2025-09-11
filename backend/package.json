@@ -1,0 +1,38 @@
+{
+  "name": "gaston-backend",
+  "version": "1.0.0",
+  "description": "Backend API for GastOn expense tracking app",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "db:migrate": "psql $DATABASE_URL -f src/db/migrations/001_initial_schema.sql",
+    "db:seed": "psql $DATABASE_URL -f src/db/migrations/002_seed_data.sql",
+    "test": "jest",
+    "lint": "eslint src/ --ext .js",
+    "lint:fix": "eslint src/ --ext .js --fix",
+    "types:copy": "cp src/types/api.ts ../mobile/src/types/api.ts"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "express-validator": "^7.0.1",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0",
+    "eslint": "^8.55.0"
+  },
+  "keywords": [
+    "expense-tracking",
+    "api",
+    "express",
+    "postgresql"
+  ],
+  "author": "GastOn Team",
+  "license": "MIT"
+}
