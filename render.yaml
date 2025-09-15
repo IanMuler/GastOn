@@ -1,0 +1,53 @@
+services:
+  # GastOn Backend API - Node.js Express Application
+  - type: web
+    name: gaston-backend-api
+    runtime: node
+    repo: https://github.com/YOUR_USERNAME/GastOn.git # Update with your actual GitHub repo URL
+    rootDir: ./backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      # Database Configuration
+      - key: DATABASE_URL
+        value: postgresql://neondb_owner:npg_5WV4aUNbKAFD@ep-muddy-pond-aez764um-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+      
+      # Server Configuration
+      - key: NODE_ENV
+        value: production
+      
+      # CORS Configuration (allow all origins for mobile app)
+      - key: CORS_ORIGIN
+        value: "*"
+      
+      # Security (for future authentication features)
+      - key: JWT_SECRET
+        value: gaston_jwt_secret_2025_secure_render
+      
+      # Database Pool Configuration (Optional)
+      - key: DB_POOL_MIN
+        value: "2"
+      - key: DB_POOL_MAX
+        value: "10"
+      - key: DB_POOL_IDLE_TIMEOUT
+        value: "30000"
+      - key: DB_POOL_CONNECTION_TIMEOUT
+        value: "2000"
+    
+    # Health check endpoint
+    healthCheckPath: /health
+    
+    # Auto-deploy configuration
+    autoDeploy: true
+    branch: main
+
+# Optional: Add a PostgreSQL database if you prefer Render's managed DB over Neon
+# databases:
+#   - name: gaston-postgres
+#     databaseName: gaston_db
+#     user: gaston_user
+#     # Free tier: expires after 90 days, 1GB storage limit
+
+# Note: This configuration uses the existing Neon PostgreSQL database
+# If you want to switch to Render's free PostgreSQL, uncomment the databases section
+# and update the DATABASE_URL environment variable accordingly
