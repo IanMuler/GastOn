@@ -100,9 +100,9 @@ DB_POOL_CONNECTION_TIMEOUT=2000
 
 Una vez deployado, tu API estará disponible en:
 
-- **Base URL**: `https://gaston-backend-api.onrender.com`
-- **Health Check**: `https://gaston-backend-api.onrender.com/health`
-- **API Endpoints**: `https://gaston-backend-api.onrender.com/api/*`
+- **Base URL**: `https://gaston-aq7o.onrender.com`
+- **Health Check**: `https://gaston-aq7o.onrender.com/health`
+- **API Endpoints**: `https://gaston-aq7o.onrender.com/api/*`
 
 ### Endpoints Principales:
 - `GET /api/categories` - Obtener categorías
@@ -119,7 +119,7 @@ En `mobile/.env`, cambiar:
 # EXPO_PUBLIC_API_URL=http://192.168.1.50:3000
 
 # Descomentar la línea de producción
-EXPO_PUBLIC_API_URL=https://gaston-backend-api.onrender.com
+EXPO_PUBLIC_API_URL=https://gaston-aq7o.onrender.com
 ```
 
 ### Para volver a desarrollo local:
@@ -229,8 +229,8 @@ Una vez completados estos pasos:
 **Costo total: $0/mes** 💚
 
 ### URLs Finales:
-- **API**: https://gaston-backend-api.onrender.com
-- **Health Check**: https://gaston-backend-api.onrender.com/health
+- **API**: https://gaston-aq7o.onrender.com
+- **Health Check**: https://gaston-aq7o.onrender.com/health
 - **Dashboard**: [Dashboard de Render](https://dashboard.render.com)
 
 ---
