@@ -30,23 +30,37 @@ import type { ApiPaths } from '@/types/api';
 // =============================================
 
 /**
- * Get current week expenses
+ * Get expenses for a specific week with offset
+ * @param weekOffset - 0 for current week, -1 for previous week, etc.
+ */
+export function useWeekExpenses(
+  weekOffset: number = 0,
+  options?: CustomQueryOptions<WeeklyExpensesResponse>
+) {
+  // For current week (offset 0), use the existing endpoint
+  const path = weekOffset === 0 
+    ? '/api/expenses/weekly/current' as keyof ApiPaths
+    : `/api/expenses/weekly?offset=${weekOffset}` as keyof ApiPaths;
+
+  return useQuery({
+    queryKey: [QueryKeys.expenses, 'weekly', weekOffset],
+    queryFn: () => fetchHandler<WeeklyExpensesResponse>({
+      path,
+      error: `Error al obtener los gastos de la semana ${weekOffset === 0 ? 'actual' : weekOffset > 0 ? 'futura' : 'anterior'}`
+    }),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
+    ...options,
+  });
+}
+
+/**
+ * Get current week expenses (backward compatibility)
  */
 export function useCurrentWeekExpenses(
   options?: CustomQueryOptions<WeeklyExpensesResponse>
 ) {
-  const path = '/api/expenses/weekly/current' as keyof ApiPaths;
-
-  return useQuery({
-    queryKey: [QueryKeys.currentWeekExpenses],
-    queryFn: () =>
-      fetchHandler<WeeklyExpensesResponse>({
-        path,
-        error: 'Error al obtener los gastos de la semana actual'
-      }),
-    staleTime: 2 * 60 * 1000, // 2 minutes - current week data changes frequently
-    ...options
-  });
+  return useWeekExpenses(0, options);
 }
 
 /**

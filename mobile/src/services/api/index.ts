@@ -29,6 +29,7 @@ export {
 // Expenses API
 export {
   useCurrentWeekExpenses,
+  useWeekExpenses,
   useWeeklyExpenses,
   useExpensesByDateRange,
   useExpense,

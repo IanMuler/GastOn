@@ -10,25 +10,28 @@ import { spacing, componentSpacing } from '@/styles/spacing';
 import { 
   getDaysOfWeek, 
   getCurrentDay, 
-  getCurrentWeekDates 
+  getWeekDates,
+  getCurrentDayForWeek
 } from '@/utils/dateUtils';
-import { useCurrentWeekExpenses } from '@/services/api';
+import { useWeekExpenses } from '@/services/api';
+import { WeekNavigationHeader } from './WeekNavigationHeader';
 import { Category } from '@/types/api';
 
 export const WeeklyView: React.FC = () => {
   /* States */
-  const [selectedDay, setSelectedDay] = useState(getCurrentDay()); // Default to current day
+  const [weekOffset, setWeekOffset] = useState(0); // 0 = current week, -1 = previous, etc.
+  const [selectedDay, setSelectedDay] = useState(() => getCurrentDayForWeek(0));
   
-  // Get current week data with React Query
+  // Get week data with React Query
   const { 
     data: weeklyData, 
     isLoading, 
     error, 
     refetch 
-  } = useCurrentWeekExpenses();
+  } = useWeekExpenses(weekOffset);
   
-  // Get current week dates
-  const { dates } = getCurrentWeekDates();
+  // Get week dates based on offset
+  const { dates, start, end } = getWeekDates(weekOffset);
   const selectedDateString = dates[selectedDay];
   
   // Find the selected day data from the weekly response
@@ -53,6 +56,12 @@ export const WeeklyView: React.FC = () => {
     setSelectedDay(dayIndex);
   };
   
+  const handleWeekChange = (newOffset: number) => {
+    setWeekOffset(newOffset);
+    // Reset to appropriate day for the new week
+    setSelectedDay(getCurrentDayForWeek(newOffset));
+  };
+  
   const handleAddExpense = () => {
     console.log('Add expense clicked');
     // TODO: Open modal or navigate to add expense screen
@@ -68,6 +77,16 @@ export const WeeklyView: React.FC = () => {
   };
 
   /* Sub-components */
+  const WeekNavigation = (
+    <WeekNavigationHeader
+      weekOffset={weekOffset}
+      startDate={start}
+      endDate={end}
+      onWeekChange={handleWeekChange}
+      isLoading={isLoading}
+    />
+  );
+
   const DayTabs = (
     <View style={styles.tabContainer}>
       <View style={styles.tabsContainer}>
@@ -130,20 +149,10 @@ export const WeeklyView: React.FC = () => {
   };
 
   // Loading and Error States
-  if (isLoading) {
-    return (
-      <View style={styles.container}>
-        {DayTabs}
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Cargando gastos...</Text>
-        </View>
-      </View>
-    );
-  }
-
   if (error) {
     return (
       <View style={styles.container}>
+        {WeekNavigation}
         {DayTabs}
         <View style={styles.errorContainer}>
           <Text style={styles.errorTitle}>Error al cargar gastos</Text>
@@ -195,6 +204,7 @@ export const WeeklyView: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      {WeekNavigation}
       {DayTabs}
       {ExpensesList}
       {FloatingActionButton}
