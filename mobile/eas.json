@@ -14,8 +14,10 @@
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "image": "latest"
       },
+      "node": "20.17.0",
       "env": {
         "EXPO_PUBLIC_API_URL": "https://gaston-aq7o.onrender.com"
       }

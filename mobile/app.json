@@ -5,7 +5,6 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "icon": "./assets/images/icon.png",
     "splash": {
       "resizeMode": "contain",
       "backgroundColor": "#F8FAFC"
@@ -20,35 +19,22 @@
     "android": {
       "package": "com.gaston.expenses",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#F8FAFC"
       },
       "permissions": []
     },
     "web": {
-      "bundler": "metro",
-      "favicon": "./assets/images/icon.png"
+      "bundler": "metro"
     },
     "scheme": "gaston",
-    "platforms": ["ios", "android", "web"],
-    "plugins": [
-      [
-        "expo-splash-screen",
-        {
-          "backgroundColor": "#F8FAFC",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "dark": {
-            "backgroundColor": "#1E293B",
-            "image": "./assets/images/splash-icon.png"
-          }
-        }
-      ]
+    "platforms": [
+      "ios",
+      "android",
+      "web"
     ],
     "extra": {
       "eas": {
-        "projectId": ""
+        "projectId": "57cdd89c-c3ec-47d1-bc4b-0702a2e88a54"
       }
     }
   }
