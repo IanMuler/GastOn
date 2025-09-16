@@ -48,7 +48,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "gaston-expenses-app"
+        "projectId": ""
       }
     }
   }
