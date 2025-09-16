@@ -23,6 +23,8 @@ mobile/assets/images/splash-icon.png  # 1024x1024, transparent background
 ### 2. **Expo Account Setup**
 Create a free Expo account at [expo.dev](https://expo.dev) if you don't have one.
 
+⚠️ **Important**: If you see "eas: not found" error, the scripts have been updated to use `npx eas` instead of `eas`.
+
 ## 🛠️ Build Commands
 
 ### Quick APK Build (Recommended)
@@ -102,10 +104,12 @@ npm run build:all:production
 
 ### 1. **First Time Setup**
 ```bash
-# Install EAS CLI globally (optional but recommended)
+# Install EAS CLI globally (already done)
 npm install -g @expo/cli
 
-# Login to your Expo account
+# Login to your Expo account  
+expo login
+# or if that doesn't work:
 npx expo login
 
 # Navigate to mobile directory
