@@ -44,6 +44,7 @@ export const fetchHandler = async <T = any>({
   try {
     const url = buildUrl(path, params as Record<string, string | number | boolean | undefined>, baseUrl);
     
+    
     const response = await fetch(url, {
       method: 'GET',
       headers: {

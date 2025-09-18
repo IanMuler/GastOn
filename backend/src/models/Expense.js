@@ -423,10 +423,18 @@ class Expense extends BaseModel {
   formatExpenseWithDetails(row) {
     if (!row) return null;
 
+    // Extract just the date part (YYYY-MM-DD) from the timestamp
+    let fecha = row.fecha;
+    if (fecha instanceof Date) {
+      fecha = formatDateToString(fecha);
+    } else if (typeof fecha === 'string' && fecha.includes('T')) {
+      fecha = fecha.split('T')[0];
+    }
+
     return {
       id: row.id,
       monto: parseFloat(row.monto),
-      fecha: row.fecha,
+      fecha: fecha,
       descripcion: row.descripcion,
       created_at: row.created_at,
       updated_at: row.updated_at,

@@ -19,6 +19,13 @@ const router = express.Router();
  * Includes validation and error handling
  */
 
+// GET /api/expenses/weekly?offset=X - Get weekly expenses with offset
+router.get('/weekly',
+  queryValidation.weekOffset,
+  handleValidationErrors,
+  asyncHandler(ExpenseController.getWeeklyExpensesByOffset)
+);
+
 // GET /api/expenses/weekly/current - Get current week expenses
 router.get('/weekly/current',
   asyncHandler(ExpenseController.getCurrentWeekExpenses)

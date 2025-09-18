@@ -137,8 +137,10 @@ export interface DayExpenses {
 export interface WeeklyExpensesResponse {
   weekStart: string; // YYYY-MM-DD
   weekEnd: string; // YYYY-MM-DD
-  days: DayExpenses[];
+  dates: string[]; // Array of dates in the week
+  expenses: Record<string, ExpenseWithDetails[]>; // Expenses organized by date
   weekTotal: number;
+  totalExpenses: number;
 }
 
 // Dashboard and Statistics
@@ -395,6 +397,9 @@ export interface ApiPaths {
   };
   '/api/expense-names/recent': {
     get: ApiOperations['getRecentlyUsedExpenseNames'];
+  };
+  '/api/expenses/weekly': {
+    get: ApiOperations['getWeeklyExpenses'];
   };
   '/api/expenses/weekly/current': {
     get: ApiOperations['getCurrentWeekExpenses'];

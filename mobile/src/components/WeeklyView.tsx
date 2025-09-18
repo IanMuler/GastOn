@@ -7,37 +7,40 @@ import { ExpenseItem } from './ExpenseItem';
 import { colors } from '@/styles/colors';
 import { typography, textStyles } from '@/styles/typography';
 import { spacing, componentSpacing } from '@/styles/spacing';
-import { 
-  getDaysOfWeek, 
-  getCurrentDay, 
+import {
+  getDaysOfWeek,
+  getCurrentDay,
   getWeekDates,
   getCurrentDayForWeek
 } from '@/utils/dateUtils';
 import { useWeekExpenses } from '@/services/api';
 import { WeekNavigationHeader } from './WeekNavigationHeader';
+import { AddExpenseModal } from './AddExpenseModal';
 import { Category } from '@/types/api';
 
 export const WeeklyView: React.FC = () => {
   /* States */
   const [weekOffset, setWeekOffset] = useState(0); // 0 = current week, -1 = previous, etc.
   const [selectedDay, setSelectedDay] = useState(() => getCurrentDayForWeek(0));
-  
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+
   // Get week data with React Query
-  const { 
-    data: weeklyData, 
-    isLoading, 
-    error, 
-    refetch 
+  const {
+    data: weeklyData,
+    isLoading,
+    error,
+    refetch
   } = useWeekExpenses(weekOffset);
-  
+
+
+
   // Get week dates based on offset
   const { dates, start, end } = getWeekDates(weekOffset);
   const selectedDateString = dates[selectedDay];
-  
-  // Find the selected day data from the weekly response
-  const selectedDayData = (weeklyData?.days || []).find(day => day.date === selectedDateString);
-  const dayExpenses = selectedDayData?.expenses || [];
-  
+
+  // Get expenses for the selected day from the weekly response
+  const dayExpenses = weeklyData?.expenses?.[selectedDateString] || [];
+
   // Organize expenses by category for the selected day
   const expensesByCategory = dayExpenses.reduce((acc, expense) => {
     const categoryName = expense.categoria.nombre;
@@ -50,27 +53,35 @@ export const WeeklyView: React.FC = () => {
     acc[categoryName].expenses.push(expense);
     return acc;
   }, {} as Record<string, { categoria: Category; expenses: ExpenseWithDetails[] }>);
-  
+
   /* Handlers */
   const handleDaySelect = (dayIndex: number) => {
     setSelectedDay(dayIndex);
   };
-  
+
   const handleWeekChange = (newOffset: number) => {
     setWeekOffset(newOffset);
     // Reset to appropriate day for the new week
     setSelectedDay(getCurrentDayForWeek(newOffset));
   };
-  
+
   const handleAddExpense = () => {
-    console.log('Add expense clicked');
-    // TODO: Open modal or navigate to add expense screen
+    setIsAddModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsAddModalVisible(false);
+  };
+
+  const handleExpenseCreated = () => {
+    // Refresh the weekly data after expense creation
+    refetch();
   };
 
   const handleRefresh = () => {
     refetch();
   };
-  
+
   const handleExpensePress = (expense: ExpenseWithDetails) => {
     console.log('Expense pressed:', expense);
     // TODO: Open edit modal
@@ -116,15 +127,15 @@ export const WeeklyView: React.FC = () => {
     categoryData: { categoria: any; expenses: ExpenseWithDetails[] };
   }) => {
     const hasActiveItems = categoryData.expenses.length > 0;
-    
+
     return (
       <View key={categoryName}>
         <View style={styles.categoryHeader}>
-          <View 
+          <View
             style={[
-              styles.categoryDot, 
+              styles.categoryDot,
               { backgroundColor: categoryData.categoria.color }
-            ]} 
+            ]}
           />
           <Text style={[
             styles.categoryTitle,
@@ -137,7 +148,7 @@ export const WeeklyView: React.FC = () => {
           <Text style={styles.emptyText}>Sin gastos</Text>
         ) : (
           categoryData.expenses.map((expense) => (
-            <ExpenseItem 
+            <ExpenseItem
               key={expense.id}
               expense={expense}
               onPress={handleExpensePress}
@@ -149,6 +160,26 @@ export const WeeklyView: React.FC = () => {
   };
 
   // Loading and Error States
+  if (isLoading && !weeklyData) {
+    return (
+      <View style={styles.container}>
+        {WeekNavigation}
+        {DayTabs}
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Cargando gastos...</Text>
+          <View style={styles.skeletonContainer}>
+            {[1, 2, 3].map((item) => (
+              <View key={item} style={styles.skeletonItem}>
+                <View style={styles.skeletonLine} />
+                <View style={styles.skeletonLineShort} />
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+    );
+  }
+
   if (error) {
     return (
       <View style={styles.container}>
@@ -168,8 +199,8 @@ export const WeeklyView: React.FC = () => {
   }
 
   const ExpensesList = (
-    <ScrollView 
-      style={styles.expensesContainer} 
+    <ScrollView
+      style={styles.expensesContainer}
       showsVerticalScrollIndicator={false}
       refreshControl={
         <RefreshControl
@@ -186,7 +217,7 @@ export const WeeklyView: React.FC = () => {
         </View>
       ) : (
         Object.entries(expensesByCategory).map(([categoryName, categoryData]) => (
-          <CategorySection 
+          <CategorySection
             key={categoryName}
             categoryName={categoryName}
             categoryData={categoryData}
@@ -208,6 +239,14 @@ export const WeeklyView: React.FC = () => {
       {DayTabs}
       {ExpensesList}
       {FloatingActionButton}
+      
+      {/* Add Expense Modal */}
+      <AddExpenseModal
+        visible={isAddModalVisible}
+        onClose={handleCloseModal}
+        selectedDate={selectedDateString}
+        onSuccess={handleExpenseCreated}
+      />
     </View>
   );
 };
@@ -217,7 +256,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  
+
   // Tab styles - exactly like timeTracker
   tabContainer: {
     paddingBottom: spacing.sm,
@@ -250,7 +289,7 @@ const styles = StyleSheet.create({
   tabTextInactive: {
     color: colors.textSecondary,
   },
-  
+
   // Category section styles - like timeTracker
   categoryHeader: {
     flexDirection: 'row',
@@ -273,12 +312,12 @@ const styles = StyleSheet.create({
   categoryTitleDisabled: {
     color: colors.textTertiary,
   },
-  
+
   // Expenses list
   expensesContainer: {
     flex: 1,
   },
-  
+
   // Empty states - like timeTracker
   emptyContainer: {
     padding: spacing.xl,
@@ -301,7 +340,39 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.sm,
     fontStyle: 'italic',
   },
-  
+
+  // Loading states
+  loadingContainer: {
+    padding: spacing.xl,
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: typography.sizes.lg,
+    color: colors.textSecondary,
+    marginBottom: spacing.lg,
+  },
+  skeletonContainer: {
+    width: '100%',
+  },
+  skeletonItem: {
+    backgroundColor: colors.surface,
+    borderRadius: 8,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  skeletonLine: {
+    height: 16,
+    backgroundColor: colors.border,
+    borderRadius: 4,
+    marginBottom: spacing.xs,
+  },
+  skeletonLineShort: {
+    height: 12,
+    width: '60%',
+    backgroundColor: colors.border,
+    borderRadius: 4,
+  },
+
   // Floating Action Button
   fab: {
     position: 'absolute',
@@ -322,7 +393,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
-  
+
   // Loading states
   loadingContainer: {
     flex: 1,
@@ -334,7 +405,7 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.base,
     color: colors.textSecondary,
   },
-  
+
   // Error states
   errorContainer: {
     flex: 1,

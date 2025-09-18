@@ -11,6 +11,29 @@ const ApiError = require('../utils/ApiError');
 class ExpenseController {
 
   /**
+   * Get expenses for a week with offset
+   * GET /api/expenses/weekly?offset=X
+   */
+  async getWeeklyExpensesByOffset(req, res, next) {
+    try {
+      const { offset } = req.query;
+      const weekOffset = offset ? parseInt(offset) : 0;
+      
+      const weeklyData = await ExpenseService.getWeeklyExpensesByOffset(weekOffset);
+      
+      const message = weekOffset === 0 
+        ? 'Current week expenses retrieved successfully'
+        : `Week expenses (offset ${weekOffset}) retrieved successfully`;
+      
+      res.status(200).json(
+        ApiResponse.success(weeklyData, message)
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * Get expenses for the current week
    * GET /api/expenses/weekly/current
    */

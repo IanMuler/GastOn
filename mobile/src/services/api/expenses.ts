@@ -37,15 +37,15 @@ export function useWeekExpenses(
   weekOffset: number = 0,
   options?: CustomQueryOptions<WeeklyExpensesResponse>
 ) {
-  // For current week (offset 0), use the existing endpoint
-  const path = weekOffset === 0 
-    ? '/api/expenses/weekly/current' as keyof ApiPaths
-    : `/api/expenses/weekly?offset=${weekOffset}` as keyof ApiPaths;
+  // Use the path with params correctly
+  const path = '/api/expenses/weekly' as keyof ApiPaths;
+  const params = { offset: weekOffset };
 
   return useQuery({
     queryKey: [QueryKeys.expenses, 'weekly', weekOffset],
     queryFn: () => fetchHandler<WeeklyExpensesResponse>({
       path,
+      params,
       error: `Error al obtener los gastos de la semana ${weekOffset === 0 ? 'actual' : weekOffset > 0 ? 'futura' : 'anterior'}`
     }),
     staleTime: 1000 * 60 * 5, // 5 minutes

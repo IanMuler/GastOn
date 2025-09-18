@@ -13,6 +13,21 @@ const { getCurrentWeekDates, getWeekDates, formatDateToString } = require('../ut
 class ExpenseService {
 
   /**
+   * Get expenses for a week with offset from current week
+   * @param {number} offset - Week offset (0 = current, -1 = previous, +1 = next)
+   * @returns {Object} Weekly expense data
+   */
+  async getWeeklyExpensesByOffset(offset = 0) {
+    // Calculate target date based on offset
+    const today = new Date();
+    const targetDate = new Date(today);
+    targetDate.setDate(today.getDate() + (offset * 7));
+    
+    const targetDateString = formatDateToString(targetDate);
+    return await Expense.findWeeklyExpenses(targetDateString);
+  }
+
+  /**
    * Get expenses for the current week
    * @returns {Object} Weekly expense data
    */

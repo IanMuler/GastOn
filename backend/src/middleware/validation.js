@@ -259,6 +259,13 @@ const queryValidation = {
       .isInt({ min: 1, max: 100 })
       .withMessage('Limit must be between 1 and 100'),
   ],
+  
+  weekOffset: [
+    query('offset')
+      .optional()
+      .isInt({ min: -52, max: 52 })
+      .withMessage('Week offset must be between -52 and 52'),
+  ],
 };
 
 // Bulk operations validation
