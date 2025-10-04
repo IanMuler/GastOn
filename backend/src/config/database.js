@@ -1,5 +1,9 @@
-const { Pool } = require('pg');
+const { Pool, neonConfig } = require('@neondatabase/serverless');
+const ws = require('ws');
 const config = require('./environment');
+
+// Configure WebSocket for Neon serverless (required for Vercel)
+neonConfig.webSocketConstructor = ws;
 
 class DatabaseConnection {
   constructor() {
@@ -12,22 +16,19 @@ class DatabaseConnection {
    */
   async initialize() {
     try {
-      // Configure pool settings for optimal performance
+      // Configure pool settings optimized for serverless
       const poolConfig = {
         connectionString: config.DATABASE_URL,
-        min: config.DB_POOL_MIN,
-        max: config.DB_POOL_MAX,
-        idleTimeoutMillis: config.DB_POOL_IDLE_TIMEOUT,
+        max: config.isProduction ? 1 : config.DB_POOL_MAX, // 1 connection in serverless
+        idleTimeoutMillis: config.isProduction ? 0 : config.DB_POOL_IDLE_TIMEOUT, // No idle connections in serverless
         connectionTimeoutMillis: config.DB_POOL_CONNECTION_TIMEOUT,
-        ssl: config.DB_SSL ? { rejectUnauthorized: false } : false,
       };
 
       this.pool = new Pool(poolConfig);
 
-      // Handle pool errors
+      // Handle pool errors (no process.exit in serverless)
       this.pool.on('error', (err) => {
         console.error('Unexpected error on idle client', err);
-        process.exit(-1);
       });
 
       // Test the connection

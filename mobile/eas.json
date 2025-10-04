@@ -19,7 +19,7 @@
       },
       "node": "20.17.0",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://gaston-aq7o.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://gaston-backend.vercel.app"
       }
     },
     "production": {
@@ -27,7 +27,7 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://gaston-aq7o.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://gaston-backend.vercel.app"
       }
     }
   },
